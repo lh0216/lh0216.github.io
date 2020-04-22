@@ -8,20 +8,24 @@
   <link rel="dns-prefetch" href="https://lh0216.github.io">
   <title>Learning Factorized Representations for Open-set Domain Adaptation | Luohui&#39;s博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="M. Baktashmotlagh, M. Faraki, T. Drummond, and M. Salzmann, “Learning Factorized Representations for open-set domain adaptation,” in ICLR, 2019.">
+  <meta name="description" content="M. Baktashmotlagh, M. Faraki, T. Drummond, and M. Salzmann, “Learning Factorized Representations for open-set domain adaptation,” in ICLR, 2019.  一句话总结：本文将子空间分为共性(shared)子空间和个性(private)子空间，认为source或t">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Learning Factorized Representations for Open-set Domain Adaptation">
 <meta property="og:url" content="https://lh0216.github.io/2020/04/13/Learning-Factorized-Representations-for-Open-set-Domain-Adaptation/index.html">
 <meta property="og:site_name" content="Luohui&#39;s博客">
-<meta property="og:description" content="M. Baktashmotlagh, M. Faraki, T. Drummond, and M. Salzmann, “Learning Factorized Representations for open-set domain adaptation,” in ICLR, 2019.">
+<meta property="og:description" content="M. Baktashmotlagh, M. Faraki, T. Drummond, and M. Salzmann, “Learning Factorized Representations for open-set domain adaptation,” in ICLR, 2019.  一句话总结：本文将子空间分为共性(shared)子空间和个性(private)子空间，认为source或t">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lh0216.github.io/images/FRODA-1.png">
+<meta property="og:image" content="https://lh0216.github.io/images/FRODA-2.png">
+<meta property="og:image" content="https://lh0216.github.io/images/FRODA-3.png">
 <meta property="article:published_time" content="2020-04-13T12:59:00.000Z">
-<meta property="article:modified_time" content="2020-04-13T13:02:59.311Z">
+<meta property="article:modified_time" content="2020-04-22T05:59:25.123Z">
 <meta property="article:author" content="Luohui">
 <meta property="article:tag" content="语音信号处理">
 <meta property="article:tag" content="机器学习">
 <meta property="article:tag" content="优化方法">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lh0216.github.io/images/FRODA-1.png">
   
     <link rel="alternative" href="/atom.xml" title="Luohui&#39;s博客" type="application/atom+xml">
   
@@ -188,6 +192,32 @@
         <blockquote>
 <p>M. Baktashmotlagh, M. Faraki, T. Drummond, and M. Salzmann, “Learning Factorized Representations for open-set domain adaptation,” in ICLR, 2019.</p>
 </blockquote>
+<p>一句话总结：本文将子空间分为共性(<code>shared</code>)子空间和个性(<code>private</code>)子空间，认为<code>source</code>或<code>target</code>中的<code>unknown</code>类由各自的个性子空间产生，而两者的<code>known</code>类由同一个共性子空间产生，从而提出了三个模型：<code>FRODA</code>、<code>D-FRODA</code>和<code>D-FRODA-U</code>。</p>
+<h3 id="FRODA-FACTORIZED-REPRESENTATIONS-FOR-OPEN-SET-DOMAIN-ADAPTATION"><a href="#FRODA-FACTORIZED-REPRESENTATIONS-FOR-OPEN-SET-DOMAIN-ADAPTATION" class="headerlink" title="FRODA: FACTORIZED REPRESENTATIONS FOR OPEN-SET DOMAIN ADAPTATION"></a>FRODA: FACTORIZED REPRESENTATIONS FOR OPEN-SET DOMAIN ADAPTATION</h3><p>该模型针对<code>source</code>只有<code>known</code>类，而<code>target</code>既有<code>known</code>类，也有<code>unknown</code>类的情形。<br><em>目标函数</em> ：</p>
+<div  align="left">    
+<img src="/images/FRODA-1.png" width = "45%" height = "45%" alt="FRODA目标函数" />
+</div>
+
+<p>其中，$\mathbf{B}=[\mathbf{V},\mathbf{U}]\in\mathcal{R}^{D\times{2d}}$表示<code>target</code>子空间的基，$\mathbf{V}$对应着共性子空间，$\mathbf{U}$对应着个性子空间。$\mathbf{T}=[\mathbf{T}^v;\mathbf{T}^u]$是target在子空间的表示。引入<strong>组稀疏正则</strong>，使得<code>target</code>样本的只能由$\mathbf{V}$或$\mathbf{U}$来生成。</p>
+<p><em>优化算法</em> ：迭代优化，一次更新一个变量，同时保持其他变量不变。</p>
+<p><em>推理</em> ：在得到最优的$\mathbf{T}$后，设定一个阈值$\epsilon$，对于<code>target</code>中的一个样本$\mathbf{T}_i$，如果$||\mathbf{T}_i^v||/||\mathbf{T}_i^u||\leq\epsilon$，则该样本被分为<code>unknown</code>类。然后，利用<code>source</code>的特征表示$\mathbf{S}$和前面被分为<code>unknown</code>类的样本的特征表示$\mathbf{T}_s^u$，共同训练一个$c+1$类的分类器。</p>
+<h3 id="D-FRODA-DISCRIMINATIVE-FRODA"><a href="#D-FRODA-DISCRIMINATIVE-FRODA" class="headerlink" title="D-FRODA: DISCRIMINATIVE FRODA"></a>D-FRODA: DISCRIMINATIVE FRODA</h3><p>在表示学习中加入<code>source</code>的标签信息。<br><em>目标函数</em> ：</p>
+<div  align="left">    
+<img src="/images/FRODA-2.png" width = "60%" height = "60%" alt="D-FRODA目标函数" />
+</div>
+
+<p>其中，$\mathbf{L}\in\mathcal{R}^{c\times{n_s}}$是<code>one-hot</code>编码形式的标签矩阵。$\mathbf{W}$是<code>source上</code>的$c$类线性分类器系数。</p>
+<p><em>优化算法</em> ：迭代优化，一次更新一个变量，同时保持其他变量不变。</p>
+<p><em>推理</em> ：策略1：与前面的一致；策略2：用$\mathbf{W}$作为<code>known</code>类的分类器。</p>
+<h3 id="D-FRODA-U-D-FRODA-WITH-UNKNOWN-SOURCE-CLASSES"><a href="#D-FRODA-U-D-FRODA-WITH-UNKNOWN-SOURCE-CLASSES" class="headerlink" title="D-FRODA-U: D-FRODA WITH UNKNOWN SOURCE CLASSES"></a>D-FRODA-U: D-FRODA WITH UNKNOWN SOURCE CLASSES</h3><p>该模型针对<code>source</code>和<code>target</code>都有<code>unknown</code>类的情形。<br><em>目标函数</em> ：</p>
+<div  align="left">    
+<img src="/images/FRODA-3.png" width = "50%" height = "50%" alt="D-FRODA-U目标函数" />
+</div>
+
+<p>其中，$\mathbf{B}’=[\mathbf{V},\mathbf{U}’]\in\mathcal{R}^{D\times{2d}}$表示<code>source</code>子空间的基，$\mathbf{S}’=[{\mathbf{S}’}^v;{\mathbf{S}’}^u]$是<code>source</code>在子空间的表示。$\mathbf{W}$是<code>source</code>上的$c+1$类线性分类器系数。</p>
+<p>说明：由于<code>source</code>上的<code>known</code>类和<code>unknown</code>类是已知的，直观上不需要对$\mathbf{S}’$进行组稀疏约束，而是直接将${\mathbf{S}’}_i^v$或${\mathbf{S}’}_i^u$置零。不过，这样处理可能过于严格，更容易受到噪声的影响。若是将其进行松弛，也就是进行组稀疏约束，可能会增加模型的鲁棒性。</p>
+<p><em>优化算法</em> ：迭代优化，一次更新一个变量，同时保持其他变量不变。</p>
+<p><em>推理</em> ：策略1：与前面的一致；策略2：用$\mathbf{W}$作为所有类的分类器。</p>
 
       
 
